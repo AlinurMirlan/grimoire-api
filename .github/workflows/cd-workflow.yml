@@ -1,0 +1,32 @@
+name: Continuous Deployment
+
+on:
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
+
+env:
+  REGISTRY: ghcr.io
+  CONTAINER_NAME: grimoire-api
+
+jobs:
+  run:
+    name: Pull Docker Image and Run Container
+    runs-on: self-hosted
+    steps:
+      - name: Set Environment Variables
+        run: |
+          echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
+
+      - name: Pull Docker Image
+        run: docker pull ${{ env.DOCKER_IMAGE }}
+
+      - name: Delete Old Docker Container
+        run: |
+          docker stop ${{ env.CONTAINER_NAME }} || true
+          docker rm ${{ env.CONTAINER_NAME }} || true
+
+      - name: Run Docker Container
+        run: docker run -d -p 80:8080 --name  ${{ env.CONTAINER_NAME }} ${{ env.DOCKER_IMAGE }}
