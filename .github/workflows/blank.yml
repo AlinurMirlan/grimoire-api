@@ -1,0 +1,29 @@
+name: Continuous Integration 
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+  workflow_dispatch:
+
+env:
+  CONTAINER_NAME: ghcr.io/$GITHUB_REPOSITORY:latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Login to Github Container Registry
+        run: docker login --username alinurmirlan --password {{ secrets.ACCESS_TOKEN }} ghcr.io
+
+      - name: Build an Image
+        run: docker build . -t $CONTAINER_NAME
+
+      - name: Push the Image to Github Container Registry
+        run: docker push $CONTAINER_NAME
+              
+      
