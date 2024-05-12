@@ -18,11 +18,11 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Login to Github Container Registry
-        run: docker login --username alinurmirlan --password {{ secrets.ACCESS_TOKEN }} ghcr.io
+        run: docker login --username alinurmirlan --password ${{ secrets.ACCESS_TOKEN }} ghcr.io
 
       - name: Build an Image
-        run: docker build . -t $CONTAINER_NAME
-
+        run: docker build . --tag $CONTAINER_NAME
+        
       - name: Push the Image to Github Container Registry
         run: docker push $CONTAINER_NAME
               
