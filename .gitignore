@@ -1,0 +1,53 @@
+# ASP.NET
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Output directory
+bin/
+obj/
+
+# Visual Studio files
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.sln.docstates
+*.nuget/
+*.dotnet/
+
+# Test Results
+TestResults/
+
+# Build Results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio code coverage results
+*.coverage
+*.coveragexml
+
+# Roslyn cache directories
+*.ide/
+*.sln.ide/
+*.ipch/
+*.suo
+/.vs
