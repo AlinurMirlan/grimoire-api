@@ -16,10 +16,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Environment Variables
-        run: |
-          echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
+      - run: echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
+      - run: echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
 
       - name: Login to Github Container Registry
         run: docker login --username ${{ github.repository_owner }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}

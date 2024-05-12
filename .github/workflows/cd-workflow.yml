@@ -15,10 +15,8 @@ jobs:
     name: Pull Docker Image and Run Container
     runs-on: self-hosted
     steps:
-      - name: Set Environment Variables
-        run: |
-          echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
+      - run: echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
+      - run: echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
 
       - name: Pull Docker Image
         run: docker pull ${{ env.DOCKER_IMAGE }}
