@@ -15,16 +15,19 @@ jobs:
     name: Pull Docker Image and Run Container
     runs-on: self-hosted
     steps:
+      - name: Login to Github Container Registry
+        run: sudo docker login --username ${{ github.repository_owner }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
+
       - run: echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
       - run: echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
 
       - name: Pull Docker Image
-        run: docker pull ${{ env.DOCKER_IMAGE }}
+        run: sudo docker pull ${{ env.DOCKER_IMAGE }}
 
       - name: Delete Old Docker Container
         run: |
-          docker stop ${{ env.CONTAINER_NAME }} || true
-          docker rm ${{ env.CONTAINER_NAME }} || true
+          sudo docker stop ${{ env.CONTAINER_NAME }} || true
+          sudo docker rm ${{ env.CONTAINER_NAME }} || true
 
       - name: Run Docker Container
-        run: docker run -d -p 80:8080 --name  ${{ env.CONTAINER_NAME }} ${{ env.DOCKER_IMAGE }}
+        run: sudo docker run -d -p 80:8080 --name  ${{ env.CONTAINER_NAME }} ${{ env.DOCKER_IMAGE }}
