@@ -3,8 +3,6 @@ name: Continuous Integration
 on:
   push:
     branches: main
-  pull_request:
-    branches: main
   workflow_dispatch:
 
 env:
@@ -12,21 +10,19 @@ env:
 
 jobs:
   build:
+    name: Build an Image and Push to Github Container Registry
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Downcase Repository Name
+      - name: Set Environment Variables
         run: |
-          echo "CONTAINER_NAME=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
+          echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
 
       - name: Login to Github Container Registry
-        run: docker login --username ${{ github.actor }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
-
-      - name: Set Docker Image Name
-        run: |
-          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.CONTAINER_NAME }}:latest" >> $GITHUB_ENV
+        run: docker login --username ${{ github.repository_owner }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
 
       - name: Build an Image
         run: docker build . --tag ${{ env.DOCKER_IMAGE }}
