@@ -9,7 +9,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  CONTAINER_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -18,12 +17,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Downcase Actor Name
+      - name: Downcase Repository Name
         run: |
-          echo "ACTOR=${GITHUB_ACTOR@L}" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
 
       - name: Login to Github Container Registry
-        run: docker login --username ${{ env.ACTOR }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
+        run: docker login --username ${{ github.actor }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
 
       - name: Set Docker Image Name
         run: |
