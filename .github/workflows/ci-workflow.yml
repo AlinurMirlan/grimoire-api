@@ -23,7 +23,7 @@ jobs:
 
       - name: Set Docker Image Name
         run: |
-          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.CONTAINER_NAME }}:latest"
+          echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.CONTAINER_NAME }}:latest" >> $GITHUB_ENV
 
       - name: Build an Image
         run: docker build . --tag ${{ env.DOCKER_IMAGE }}
