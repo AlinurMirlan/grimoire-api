@@ -2,6 +2,7 @@ using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2;
 using Grimoire.Api.Repositories;
 using Grimoire.Api.Models;
+using System.Security.AccessControl;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,30 +22,33 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/book/{isbn}", (IBookRepository bookRepository, string isbn) =>
+app.MapGet("/book/{isbn}", async (IBookRepository bookRepository, string isbn) =>
 {
-    return bookRepository.GetBookByIsbnAsync(isbn);
+    var book = await bookRepository.GetBookByIsbnAsync(isbn);
+    return book is null ? Results.NotFound() : Results.Ok(book);
 })
 .WithName("GetBook")
 .WithOpenApi();
 
-app.MapGet("/books", (IBookRepository bookRepository, int count, string? lastEvaluatedKey) =>
+app.MapGet("/books", async (IBookRepository bookRepository, int count, string? lastEvaluatedKey) =>
 {
-    return bookRepository.GetBooksAsync(count, lastEvaluatedKey);
+    return await bookRepository.GetBooksAsync(count, lastEvaluatedKey);
 })
 .WithName("GetBooks")
 .WithOpenApi();
 
-app.MapPost("/save/book", (IBookRepository bookRepository, Book book) =>
+app.MapPost("/save/book", async (IBookRepository bookRepository, Book book) =>
 {
-    return bookRepository.SaveBookAsync(book);
+    await bookRepository.SaveBookAsync(book);
+    return Results.Created($"/book/{book.Isbn}", book);
 })
 .WithName("SaveBook")
 .WithOpenApi();
 
-app.MapDelete("/delete/book/{isbn}", (IBookRepository bookRepository, string isbn) =>
+app.MapDelete("/delete/book/{isbn}", async (IBookRepository bookRepository, string isbn) =>
 {
-    return bookRepository.DeleteBookAsync(isbn);
+    await bookRepository.DeleteBookAsync(isbn);
+    return Results.NoContent();
 })
 .WithName("DeleteBook")
 .WithOpenApi();
