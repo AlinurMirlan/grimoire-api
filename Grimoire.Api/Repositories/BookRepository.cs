@@ -22,19 +22,27 @@ public class BookRepository(
         var scanRequest = new ScanRequest
         {
             Limit = count,
-            TableName = nameof(Book),
-            ExclusiveStartKey = new Dictionary<string, AttributeValue>()
+            TableName = nameof(Book)
+        };
+
+        if (lastEvaluatedKey is not null)
+        {
+            scanRequest.ExclusiveStartKey = new Dictionary<string, AttributeValue>
             {
                 { nameof(Book.Isbn), new AttributeValue { S = lastEvaluatedKey } }
-            }
-        };
+            };
+        }
 
         var scanResponse = await AmazonDynamoDB.ScanAsync(scanRequest);
         var books = scanResponse.Items.Select(
             item => DynamoDBContext.FromDocument<Book>(
                 Document.FromAttributeMap(item)));
     
-        lastEvaluatedKey = scanResponse.LastEvaluatedKey[nameof(Book.Isbn)].S;
+        if (scanResponse.LastEvaluatedKey.TryGetValue(nameof(Book.Isbn), out AttributeValue? attributeValue))
+        {
+            lastEvaluatedKey = attributeValue.S;
+        }
+
         return new PagedResults<Book>()
         {
             Items = books,
