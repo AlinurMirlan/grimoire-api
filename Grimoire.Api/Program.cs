@@ -1,13 +1,18 @@
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2;
+using Grimoire.Api.Repositories;
+using Grimoire.Api.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
+builder.Services.AddSingleton<IAmazonDynamoDB, AmazonDynamoDBClient>();
+builder.Services.AddSingleton<IBookRepository, BookRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,29 +21,32 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/book/{isbn}", (IBookRepository bookRepository, string isbn) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    return bookRepository.GetBookByIsbnAsync(isbn);
 })
-.WithName("GetWeatherForecast")
+.WithName("GetBook")
+.WithOpenApi();
+
+app.MapGet("/books", (IBookRepository bookRepository, int count, string? lastEvaluatedKey) =>
+{
+    return bookRepository.GetBooksAsync(count, lastEvaluatedKey);
+})
+.WithName("GetBooks")
+.WithOpenApi();
+
+app.MapPost("/save/book", (IBookRepository bookRepository, Book book) =>
+{
+    return bookRepository.SaveBookAsync(book);
+})
+.WithName("SaveBook")
+.WithOpenApi();
+
+app.MapDelete("/delete/book/{isbn}", (IBookRepository bookRepository, string isbn) =>
+{
+    return bookRepository.DeleteBookAsync(isbn);
+})
+.WithName("DeleteBook")
 .WithOpenApi();
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
