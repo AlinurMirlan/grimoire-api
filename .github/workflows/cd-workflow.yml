@@ -15,31 +15,18 @@ jobs:
     name: Pull Docker Image and Run Container
     runs-on: ubuntu-latest
     steps:
-      - name: Setup SSH
-        run: |
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > private.pem
-          chmod 600 private.pem
-
-      - name: SSH into EC2 Instance
-        run: |
-          ssh -o StrictHostKeyChecking=no -i private.pem ubuntu@ec2-13-59-130-149.us-east-2.compute.amazonaws.com
-
-      - name: Login to Github Container Registry
-        run: sudo docker login --username ${{ github.repository_owner }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
-
       - run: echo "REPOSITORY=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
       - run: echo "DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest" >> $GITHUB_ENV
 
-      - name: Pull Docker Image
-        run: sudo docker pull ${{ env.DOCKER_IMAGE }}
-
-      - name: Delete Old Docker Container
-        run: |
-          sudo docker stop ${{ env.CONTAINER_NAME }} || true
-          sudo docker rm ${{ env.CONTAINER_NAME }} || true
-
-      - name: Run Docker Container
-        run: sudo docker run -d -p 80:8080 --name  ${{ env.CONTAINER_NAME }} ${{ env.DOCKER_IMAGE }}
-
-      - name: Exit SSH
-        run: exit
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            sudo docker login --username ${{ github.repository_owner }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
+            sudo docker pull ${{ env.DOCKER_IMAGE }}
+            sudo docker stop ${{ env.CONTAINER_NAME }} || true
+            sudo docker rm ${{ env.CONTAINER_NAME }} || true
+            sudo docker run -d -p 80:8080 --name  ${{ env.CONTAINER_NAME }} ${{ env.DOCKER_IMAGE }}
