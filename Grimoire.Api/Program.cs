@@ -47,7 +47,7 @@ app.MapPost("/book/add", async (IBookService bookService, Book book) =>
     }
     catch (ConflictException exception)
     {
-        return Results.Conflict(exception);
+        return Results.Conflict(exception.Message);
     }
 
     return Results.Created($"/book/{book.Isbn}", createdBook);
@@ -72,7 +72,7 @@ app.MapPut("/book/edit", async (IBookService bookService, Book book) =>
     }
     catch (ConflictException exception)
     {
-        return Results.Conflict(exception);
+        return Results.Conflict(exception.Message);
     }
 
     return Results.Ok(editedBook);
