@@ -13,8 +13,17 @@ env:
 jobs:
   run:
     name: Pull Docker Image and Run Container
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > private.pem
+          chmod 600 private.pem
+
+      - name: SSH into EC2 Instance
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private.pem ubuntu@ec2-13-59-130-149.us-east-2.compute.amazonaws.com
+
       - name: Login to Github Container Registry
         run: sudo docker login --username ${{ github.repository_owner }} --password ${{ secrets.REGISTRY_TOKEN }} ${{ env.REGISTRY }}
 
