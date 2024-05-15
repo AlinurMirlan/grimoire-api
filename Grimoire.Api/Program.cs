@@ -13,7 +13,14 @@ builder.Services.AddSingleton<IAmazonDynamoDB, AmazonDynamoDBClient>();
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
 
+const string corsPolicyName = "CorsPolicy";
+builder.Services.AddCors(p => p.AddPolicy(corsPolicyName, build =>
+{
+    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
+
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -22,6 +29,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(corsPolicyName);
 
 app.MapGet("/book/{isbn}", async (IBookService bookService, string isbn) =>
 {
