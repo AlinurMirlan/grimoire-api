@@ -34,6 +34,7 @@ public class BookService : IBookService
             throw new ConflictException("There is already a book with the given ISBN.");
         }
 
+        await bookRepository.SaveBookAsync(book);
         return book;
     }
 
