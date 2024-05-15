@@ -42,11 +42,8 @@ public class BookService : IBookService
 
     public async Task<Book> EditBookAsync(Book book)
     {
-        var existingBook = await bookRepository.GetBookByIsbnAsync(book.Isbn);
-        if (existingBook is null)
-        {
-            throw new ConflictException("There is no book with the given ISBN.");
-        }
+        _ = await bookRepository.GetBookByIsbnAsync(book.Isbn)
+            ?? throw new ConflictException("There is no book with the given ISBN.");
 
         await bookRepository.SaveBookAsync(book);
         return book;
