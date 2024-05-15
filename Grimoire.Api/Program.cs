@@ -1,6 +1,8 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
-using Grimoire.Api.Exceptions;
+using FluentValidation;
+using Grimoire.Api.Infrastructure.Exceptions;
+using Grimoire.Api.Infrastructure.FIlters;
 using Grimoire.Api.Models;
 using Grimoire.Api.Repositories;
 using Grimoire.Api.Services;
@@ -12,6 +14,7 @@ builder.Services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
 builder.Services.AddSingleton<IAmazonDynamoDB, AmazonDynamoDBClient>();
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
+builder.Services.AddValidatorsFromAssemblyContaining<Book>();
 
 const string corsPolicyName = "CorsPolicy";
 builder.Services.AddCors(p => p.AddPolicy(corsPolicyName, build =>
@@ -61,6 +64,7 @@ app.MapPost("/book/add", async (IBookService bookService, Book book) =>
 
     return Results.Created($"/book/{book.Isbn}", createdBook);
 })
+.AddEndpointFilter<ValidationFilter<Book>>()
 .WithName("BookSave")
 .WithOpenApi();
 
@@ -86,6 +90,7 @@ app.MapPut("/book/edit", async (IBookService bookService, Book book) =>
 
     return Results.Ok(editedBook);
 })
+.AddEndpointFilter<ValidationFilter<Book>>()
 .WithName("BookEdit")
 .WithOpenApi();
 

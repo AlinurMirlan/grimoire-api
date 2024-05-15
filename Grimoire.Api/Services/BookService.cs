@@ -1,4 +1,4 @@
-﻿using Grimoire.Api.Exceptions;
+﻿using Grimoire.Api.Infrastructure.Exceptions;
 using Grimoire.Api.Models;
 using Grimoire.Api.Repositories;
 
