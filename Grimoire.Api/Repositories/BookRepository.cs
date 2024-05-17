@@ -19,7 +19,7 @@ public class BookRepository(
 
     public async Task<PagedResults<Book>> GetBooksAsync(int count, string? lastEvaluatedKey)
     {
-        var scanRequest = new QueryRequest
+        var scanRequest = new ScanRequest
         {
             Limit = count,
             TableName = nameof(Book)
@@ -33,7 +33,7 @@ public class BookRepository(
             };
         }
 
-        var scanResponse = await AmazonDynamoDB.QueryAsync(scanRequest);
+        var scanResponse = await AmazonDynamoDB.ScanAsync(scanRequest);
         var books = scanResponse.Items.Select(
             item => DynamoDBContext.FromDocument<Book>(
                 Document.FromAttributeMap(item)));
