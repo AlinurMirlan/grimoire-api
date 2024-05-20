@@ -40,11 +40,12 @@ public class BookService : IBookService
 
     public Task DeleteBookAsync(string isbn) => bookRepository.DeleteBookAsync(isbn);
 
-    public async Task<Book> EditBookAsync(Book book)
+    public async Task<Book> EditBookAsync(string isbn, Book book)
     {
-        _ = await bookRepository.GetBookByIsbnAsync(book.Isbn)
+        _ = await bookRepository.GetBookByIsbnAsync(isbn)
             ?? throw new ConflictException("There is no book with the given ISBN.");
 
+        book.Isbn = isbn;
         await bookRepository.SaveBookAsync(book);
         return book;
     }
