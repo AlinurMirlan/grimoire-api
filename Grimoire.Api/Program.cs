@@ -76,12 +76,12 @@ app.MapDelete("/books/{isbn}", async (IBookService bookService, string isbn) =>
 .WithName("DeleteBook")
 .WithOpenApi();
 
-app.MapPut("/books/{isbn}", async (IBookService bookService, Book book) =>
+app.MapPut("/books/{isbn}", async (IBookService bookService, string isbn, Book book) =>
 {
     Book editedBook;
     try
     {
-        editedBook = await bookService.EditBookAsync(book);
+        editedBook = await bookService.EditBookAsync(isbn, book);
     }
     catch (ConflictException exception)
     {
