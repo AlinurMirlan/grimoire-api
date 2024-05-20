@@ -35,7 +35,7 @@ app.UseHttpsRedirection();
 
 app.UseCors(corsPolicyName);
 
-app.MapGet("/book/{isbn}", async (IBookService bookService, string isbn) =>
+app.MapGet("/books/{isbn}", async (IBookService bookService, string isbn) =>
 {
     var book = await bookService.GetBookByIsbnAsync(isbn);
     return book is null ? Results.NotFound() : Results.Ok(book);
@@ -50,7 +50,7 @@ app.MapGet("/books", async (IBookService bookService, int? count, string? lastEv
 .WithName("BooksGet")
 .WithOpenApi();
 
-app.MapPost("/book/add", async (IBookService bookService, Book book) =>
+app.MapPost("/books", async (IBookService bookService, Book book) =>
 {
     Book createdBook;
     try
@@ -68,7 +68,7 @@ app.MapPost("/book/add", async (IBookService bookService, Book book) =>
 .WithName("BookSave")
 .WithOpenApi();
 
-app.MapDelete("/book/delete/{isbn}", async (IBookService bookService, string isbn) =>
+app.MapDelete("/books/{isbn}", async (IBookService bookService, string isbn) =>
 {
     await bookService.DeleteBookAsync(isbn);
     return Results.NoContent();
@@ -76,12 +76,12 @@ app.MapDelete("/book/delete/{isbn}", async (IBookService bookService, string isb
 .WithName("DeleteBook")
 .WithOpenApi();
 
-app.MapPut("/book/edit", async (IBookService bookService, Book book) =>
+app.MapPut("/books/{isbn}", async (IBookService bookService, string isbn, Book book) =>
 {
     Book editedBook;
     try
     {
-        editedBook = await bookService.EditBookAsync(book);
+        editedBook = await bookService.EditBookAsync(isbn, book);
     }
     catch (ConflictException exception)
     {

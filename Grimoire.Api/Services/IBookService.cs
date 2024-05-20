@@ -12,5 +12,5 @@ public interface IBookService
 
     public Task DeleteBookAsync(string isbn);
 
-    public Task<Book> EditBookAsync(Book book);
+    public Task<Book> EditBookAsync(string isbn, Book book);
 }
