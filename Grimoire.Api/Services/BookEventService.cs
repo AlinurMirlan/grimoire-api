@@ -22,7 +22,6 @@ public class BookEventService(
         {
             QueueUrl = queueUrl,
             MessageBody = JsonSerializer.Serialize(@event),
-            MessageGroupId = @event.StreamId,
             MessageAttributes = new Dictionary<string, MessageAttributeValue>
             {
                 {
