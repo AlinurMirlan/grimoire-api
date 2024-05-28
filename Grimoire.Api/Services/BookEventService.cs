@@ -11,7 +11,7 @@ public class BookEventService(
     IConfiguration configuration) 
     : IBookEventService
 {
-    private readonly string queueUrl = configuration["Application:EventSource:SQS"] 
+    private readonly string queueUrl = configuration["Application:EventSource:SQS:QueueUrl"] 
         ?? throw new ConfigurationException(nameof(queueUrl));
     private readonly string sqsAttributeTimeStamp = configuration["Application:EventSource:SQS:Attributes:TimeStamp"] 
         ?? throw new ConfigurationException(nameof(sqsAttributeTimeStamp));
