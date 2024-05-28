@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.SQS;
 using FluentValidation;
 using Grimoire.Api.Infrastructure.Exceptions;
 using Grimoire.Api.Infrastructure.FIlters;
@@ -14,6 +15,8 @@ builder.Services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
 builder.Services.AddSingleton<IAmazonDynamoDB, AmazonDynamoDBClient>();
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
+builder.Services.AddSingleton<IBookEventService, BookEventService>();
+builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>(_ => new AmazonSQSClient(Amazon.RegionEndpoint.USEast2));
 builder.Services.AddValidatorsFromAssemblyContaining<Book>();
 
 const string corsPolicyName = "CorsPolicy";

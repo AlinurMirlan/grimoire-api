@@ -1,5 +1,6 @@
 ﻿using Grimoire.Api.Infrastructure.Exceptions;
 using Grimoire.Api.Models;
+using Grimoire.Api.Models.Events;
 using Grimoire.Api.Repositories;
 
 namespace Grimoire.Api.Services;
@@ -9,10 +10,12 @@ public class BookService : IBookService
     private readonly int defaultPageSize;
     private readonly int maxPageSize;
     private readonly IBookRepository bookRepository;
+    private readonly IBookEventService bookEventService;
 
-    public BookService(IConfiguration configuration, IBookRepository bookRepository)
+    public BookService(IConfiguration configuration, IBookRepository bookRepository, IBookEventService bookEventService)
     {
         this.bookRepository = bookRepository;
+        this.bookEventService = bookEventService;
         defaultPageSize = configuration.GetValue<int>("Application:Pagination:DefaultPageSize");
         maxPageSize = configuration.GetValue<int>("Application:Pagination:MaxPageSize");
         if (defaultPageSize <= 0)
@@ -35,10 +38,15 @@ public class BookService : IBookService
         }
 
         await bookRepository.SaveBookAsync(book);
+        await bookEventService.FireEvent(new BookCreated(book));
         return book;
     }
 
-    public Task DeleteBookAsync(string isbn) => bookRepository.DeleteBookAsync(isbn);
+    public async Task DeleteBookAsync(string isbn)
+    {
+        await bookRepository.DeleteBookAsync(isbn);
+        await bookEventService.FireEvent(new BookDeleted(new Book() { Isbn = isbn } ));
+    }
 
     public async Task<Book> EditBookAsync(string isbn, Book book)
     {
@@ -47,6 +55,7 @@ public class BookService : IBookService
 
         book.Isbn = isbn;
         await bookRepository.SaveBookAsync(book);
+        await bookEventService.FireEvent(new BookUpdated(book));
         return book;
     }
 

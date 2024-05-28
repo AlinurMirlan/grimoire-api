@@ -7,15 +7,15 @@ using Grimoire.Api.Models;
 namespace Grimoire.Api.Repositories;
 
 public class BookRepository(
-    IDynamoDBContext DynamoDBContext,
-    IAmazonDynamoDB AmazonDynamoDB) 
+    IDynamoDBContext dynamoDbContext,
+    IAmazonDynamoDB amazonDynamoDb) 
     : IBookRepository
 {
-    public async Task SaveBookAsync(Book book) => await DynamoDBContext.SaveAsync(book);
+    public async Task SaveBookAsync(Book book) => await dynamoDbContext.SaveAsync(book);
 
-    public async Task DeleteBookAsync(string isbn) => await DynamoDBContext.DeleteAsync<Book>(isbn);
+    public async Task DeleteBookAsync(string isbn) => await dynamoDbContext.DeleteAsync<Book>(isbn);
 
-    public Task<Book> GetBookByIsbnAsync(string isbn) => DynamoDBContext.LoadAsync<Book>(isbn);
+    public Task<Book> GetBookByIsbnAsync(string isbn) => dynamoDbContext.LoadAsync<Book>(isbn);
 
     public async Task<PagedResults<Book>> GetBooksAsync(int count, string? lastEvaluatedKey)
     {
@@ -33,9 +33,9 @@ public class BookRepository(
             };
         }
 
-        var scanResponse = await AmazonDynamoDB.ScanAsync(scanRequest);
+        var scanResponse = await amazonDynamoDb.ScanAsync(scanRequest);
         var books = scanResponse.Items.Select(
-            item => DynamoDBContext.FromDocument<Book>(
+            item => dynamoDbContext.FromDocument<Book>(
                 Document.FromAttributeMap(item)));
     
         if (scanResponse.LastEvaluatedKey.TryGetValue(nameof(Book.Isbn), out AttributeValue? attributeValue))
