@@ -4,6 +4,7 @@ using Amazon.SQS;
 using FluentValidation;
 using Grimoire.Api.Infrastructure.Exceptions;
 using Grimoire.Api.Infrastructure.FIlters;
+using Grimoire.Api.Infrastructure.Visitors;
 using Grimoire.Api.Models;
 using Grimoire.Api.Repositories;
 using Grimoire.Api.Services;
@@ -17,6 +18,7 @@ builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
 builder.Services.AddSingleton<IBookEventService, BookEventService>();
 builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>(_ => new AmazonSQSClient(Amazon.RegionEndpoint.USEast2));
+builder.Services.AddSingleton<BookJsonVisitor>();
 builder.Services.AddValidatorsFromAssemblyContaining<Book>();
 
 const string corsPolicyName = "CorsPolicy";

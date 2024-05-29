@@ -1,14 +1,16 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
 using Grimoire.Api.Infrastructure.Exceptions;
+using Grimoire.Api.Infrastructure.Visitors;
 using Grimoire.Api.Models.Events;
-using System.Text.Json;
+using System.Runtime.Serialization;
 
 namespace Grimoire.Api.Services;
 
 public class BookEventService(
     IAmazonSQS amazonSqs,
-    IConfiguration configuration) 
+    IConfiguration configuration,
+    BookJsonVisitor bookJsonVisitor) 
     : IBookEventService
 {
     private readonly string queueUrl = configuration["Application:EventSource:SQS:QueueUrl"] 
@@ -16,12 +18,14 @@ public class BookEventService(
     private readonly string sqsAttributeTimeStamp = configuration["Application:EventSource:SQS:Attributes:TimeStamp"] 
         ?? throw new ConfigurationException(nameof(sqsAttributeTimeStamp));
 
-    public Task FireEvent(Event @event)
+    public Task FireBookEvent(Event bookEvent)
     {
+        bookEvent.Visit(bookJsonVisitor);
         var request = new SendMessageRequest
         {
             QueueUrl = queueUrl,
-            MessageBody = JsonSerializer.Serialize(@event),
+            MessageBody = bookJsonVisitor.BookJson 
+                ?? throw new SerializationException($"{nameof(Event)} could not be serialized."),
             MessageAttributes = new Dictionary<string, MessageAttributeValue>
             {
                 {

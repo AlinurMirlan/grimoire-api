@@ -38,14 +38,14 @@ public class BookService : IBookService
         }
 
         await bookRepository.SaveBookAsync(book);
-        await bookEventService.FireEvent(new BookCreated(book));
+        await bookEventService.FireBookEvent(new BookCreated(book));
         return book;
     }
 
     public async Task DeleteBookAsync(string isbn)
     {
         await bookRepository.DeleteBookAsync(isbn);
-        await bookEventService.FireEvent(new BookDeleted(new Book() { Isbn = isbn } ));
+        await bookEventService.FireBookEvent(new BookDeleted(new Book() { Isbn = isbn } ));
     }
 
     public async Task<Book> EditBookAsync(string isbn, Book book)
@@ -55,7 +55,7 @@ public class BookService : IBookService
 
         book.Isbn = isbn;
         await bookRepository.SaveBookAsync(book);
-        await bookEventService.FireEvent(new BookUpdated(book));
+        await bookEventService.FireBookEvent(new BookUpdated(book));
         return book;
     }
 
