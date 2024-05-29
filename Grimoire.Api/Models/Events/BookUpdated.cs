@@ -1,4 +1,6 @@
-﻿namespace Grimoire.Api.Models.Events;
+﻿using Grimoire.Api.Infrastructure.Visitors;
+
+namespace Grimoire.Api.Models.Events;
 
 public class BookUpdated(Book book) : Event
 {
@@ -11,4 +13,9 @@ public class BookUpdated(Book book) : Event
     public override string StreamId => Isbn;
 
     public override string Type { get; } = nameof(BookUpdated);
+
+    public override void Visit(IBookVisitor visitor)
+    {
+        visitor.Visit(this);
+    }
 }

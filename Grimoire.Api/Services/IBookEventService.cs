@@ -4,5 +4,5 @@ namespace Grimoire.Api.Services;
 
 public interface IBookEventService
 {
-    public Task FireEvent(Event @event);
+    public Task FireBookEvent(Event bookEvent);
 }
